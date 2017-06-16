@@ -1,8 +1,7 @@
-import React from 'react';
+import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-
-const { Component } = React;
-const { isFinite, debounce } = _;
+import isFinite from 'lodash/isFinite';
+import debounce from 'lodash/debounce';
 
 const DEFAULT_DEBOUNCE_MS = 200;
 
