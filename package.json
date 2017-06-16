@@ -1,0 +1,13 @@
+{
+  "name": "numericInput",
+  "version": "1.0.0",
+  "description": "Numeric Input Component",
+  "main": "index.js",
+  "repository": "https://github.com/ben196888/Numeric-Input.git",
+  "author": "Ben Liu <ben196888@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "prop-types": "^15.5.10",
+    "react": "^15.6.1"
+  }
+}
