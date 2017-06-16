@@ -2,11 +2,15 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 const { Component } = React;
-const { isFinite } = _;
+const { isFinite, debounce } = _;
+
+const DEFAULT_DEBOUNCE_MS = 200;
 
 class NumericInput extends Component {
 	constructor (props) {
 		super(props);
+		this.fireOnChange = this.fireOnChange.bind(this);
+		this.fireOnChange = debounce(this.fireOnChange, DEFAULT_DEBOUNCE_MS);
 		this.state = {
 			isTyping: false,
 			value: String(props.value),
@@ -18,16 +22,13 @@ class NumericInput extends Component {
 	}
 
 	onChangeHandler (event) {
-		const { onChange } = this.props;
 		const value = event.target.value.trim();
 		const pattern = /^(\-|\+|\.|[0-9])+$/;
 		const validString = pattern.exec(value);
 		event.target.value = value;
+		event.persist();
 		if (value === '' || validString) {
-			const isFiniteValue = isFinite(Number(value));
-			if (isFiniteValue) {
-				onChange(event);
-			}
+			this.fireOnChange(event);
 			this.setState({
 				value,
 			});
@@ -48,6 +49,15 @@ class NumericInput extends Component {
 			isTyping: false,
 			value,
 		});
+	}
+
+	fireOnChange (event) {
+		const { onChange } = this.props;
+		const value = event.target.value;
+		const isFiniteValue = isFinite(Number(value));
+		if (isFiniteValue) {
+			onChange(event);
+		}
 	}
 
 	render () {
