@@ -3,16 +3,25 @@ import PropTypes from 'prop-types';
 import isFinite from 'lodash/isFinite';
 import debounce from 'lodash/debounce';
 
-const DEFAULT_DEBOUNCE_MS = 200;
+const DEFAULT_DEBOUNCE_MS = 100;
+
+const NUMERIC_PATTERN = /^(\-|\+|\.|[0-9])+$/;
+const SIGN_PATTERN = /\+|\-/;
+const MULTIPLE_SIGNS_PATTERN = new RegExp(SIGN_PATTERN, 'g');
+const MULTIPLE_DOTS_PATTERN = /\./g;
 
 class NumericInput extends Component {
   constructor (props) {
     super(props);
     this.fireOnChange = this.fireOnChange.bind(this);
     this.fireOnChange = debounce(this.fireOnChange, DEFAULT_DEBOUNCE_MS);
+    this.onChangeHandler = this.onChangeHandler.bind(this);
+    this.onFocusHandler = this.onFocusHandler.bind(this);
+    this.onBlurHandler = this.onBlurHandler.bind(this);
     this.state = {
       isTyping: false,
       value: String(props.value),
+      timeout: null,
     };
   }
 
@@ -20,33 +29,55 @@ class NumericInput extends Component {
     return nextState.value !== this.state.value;
   }
 
+  componentWillUnmount () {
+    const timeout = this.state.timeout;
+    if (timeout) {
+      clearTimeout(timeout);
+    }
+  }
+
   onChangeHandler (event) {
     const value = event.target.value.trim();
-    const pattern = /^(\-|\+|\.|[0-9])+$/;
-    const validString = pattern.exec(value);
+    const validString = NUMERIC_PATTERN.test(value);
     event.target.value = value;
     event.persist();
     if (value === '' || validString) {
-      this.fireOnChange(event);
-      this.setState({
-        value,
-      });
+      const matchDots = value.match(MULTIPLE_DOTS_PATTERN) || [];
+      const matchSigns = value.match(MULTIPLE_SIGNS_PATTERN) || [];
+
+      const matchSign = value.match(SIGN_PATTERN);
+      const signIdx = matchSign ? matchSign.index : 0;
+
+      if (matchDots.length <= 1 && matchSigns.length <= 1 && signIdx === 0) {
+        this.fireOnChange(event);
+        this.setState({
+          value,
+        });
+      }
     }
   }
 
   onFocusHandler () {
-    const { value } = this.props;
+    const timeout = this.state.timeout;
+    if (timeout) {
+      clearTimeout(timeout);
+    }
     this.setState({
       isTyping: true,
-      value,
+      timeout: null,
     });
   }
 
   onBlurHandler () {
-    const { value } = this.props;
+    const timeout = setTimeout(() => {
+      const { value } = this.props;
+      this.setState({
+        isTyping: false,
+        value,
+      });
+    }, DEFAULT_DEBOUNCE_MS);
     this.setState({
-      isTyping: false,
-      value,
+      timeout,
     });
   }
 
@@ -78,9 +109,9 @@ class NumericInput extends Component {
         style={style}
         disabled={disabled}
         value={displayValue}
-        onChange={(event) => this.onChangeHandler(event)}
-        onFocus={() => this.onFocusHandler()}
-        onBlur={() => this.onBlurHandler()}
+        onChange={this.onChangeHandler}
+        onFocus={this.onFocusHandler}
+        onBlur={this.onBlurHandler}
       />
     );
   }
