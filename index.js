@@ -18,6 +18,7 @@ class NumericInput extends Component {
     this.onChangeHandler = this.onChangeHandler.bind(this);
     this.onFocusHandler = this.onFocusHandler.bind(this);
     this.onBlurHandler = this.onBlurHandler.bind(this);
+    this.onKeyPressHander = this.onKeyPressHander.bind(this);
     this.state = {
       isTyping: false,
       value: String(props.value),
@@ -81,6 +82,11 @@ class NumericInput extends Component {
     });
   }
 
+  onKeyPressHander (event) {
+    const { onKeyPress } = this.props;
+    onKeyPress(event);
+  }
+
   fireOnChange (event) {
     const { onChange } = this.props;
     const value = event.target.value;
@@ -112,6 +118,7 @@ class NumericInput extends Component {
         onChange={this.onChangeHandler}
         onFocus={this.onFocusHandler}
         onBlur={this.onBlurHandler}
+        onKeyPress={this.onKeyPressHander}
       />
     );
   }
@@ -121,6 +128,7 @@ NumericInput.propTypes = {
   id: PropTypes.string,
   value: PropTypes.any,
   onChange: PropTypes.func,
+  onKeyPress: PropTypes.func,
   className: PropTypes.string,
   style: PropTypes.object,
   disabled: PropTypes.bool,
@@ -130,6 +138,7 @@ NumericInput.defaultProps = {
   id: '',
   value: '',
   onChange: () => null,
+  onKeyPress: () => null,
   className: '',
   style: {},
   disabled: false,
