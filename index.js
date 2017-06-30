@@ -30,6 +30,14 @@ class NumericInput extends Component {
     return nextState.value !== this.state.value;
   }
 
+  componentWillReceiveProps (nextProps) {
+    if (!this.state.isTyping) {
+      this.setState({
+        value: String(nextProps.value),
+      });
+    }
+  }
+
   componentWillUnmount () {
     const timeout = this.state.timeout;
     if (timeout) {
