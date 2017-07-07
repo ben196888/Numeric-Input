@@ -66,7 +66,8 @@ class NumericInput extends Component {
     }
   }
 
-  onFocusHandler () {
+  onFocusHandler (event) {
+    const { onFocus } = this.props;
     const timeout = this.state.timeout;
     if (timeout) {
       clearTimeout(timeout);
@@ -75,6 +76,7 @@ class NumericInput extends Component {
       isTyping: true,
       timeout: null,
     });
+    onFocus(event);
   }
 
   onBlurHandler () {
@@ -136,6 +138,7 @@ NumericInput.propTypes = {
   id: PropTypes.string,
   value: PropTypes.any,
   onChange: PropTypes.func,
+  onFocus: PropTypes.func,
   onKeyPress: PropTypes.func,
   className: PropTypes.string,
   style: PropTypes.object,
@@ -146,6 +149,7 @@ NumericInput.defaultProps = {
   id: '',
   value: '',
   onChange: () => null,
+  onFocus: () => null,
   onKeyPress: () => null,
   className: '',
   style: {},
