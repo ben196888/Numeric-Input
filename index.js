@@ -94,7 +94,13 @@ class NumericInput extends Component {
 
   onKeyPressHander (event) {
     const { onKeyPress } = this.props;
-    onKeyPress(event);
+    if (event.key === 'Enter') {
+      event.target.blur();
+      onKeyPress(event);
+      event.target.focus();
+    } else {
+      onKeyPress(event);
+    }
   }
 
   fireOnChange (event) {
